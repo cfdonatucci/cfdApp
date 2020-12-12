@@ -3,6 +3,6 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. EJEMPLO2.
        PROCEDURE DIVISION.
-           DISPLAY 'Hola Manola '.
+           DISPLAY 'Hola Manolete '.
            STOP RUN.
       */////////////////////////////////////////////
