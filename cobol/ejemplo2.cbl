@@ -4,6 +4,6 @@
        PROGRAM-ID. EJEMPLO2.
        PROCEDURE DIVISION.
            DISPLAY 'Hola Manoletes '.
-           CALL 'PROG1'.
+           CALL 'PRUEBA04'.
            STOP RUN.
       */////////////////////////////////////////////
