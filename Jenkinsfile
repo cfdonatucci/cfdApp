@@ -29,9 +29,10 @@ def buildType='-f'
 def buildExtraParams='-d'
 // ===========================================================
 pipeline { 
-  agent { label zosAgent }
+  agent { label linuxAgent  }
       environment { WORK_DIR = "${WORKSPACE}/builds/build-${BUILD_NUMBER}" }
       options { skipDefaultCheckout(true) }
+
 // -------------------------------------------------------------------------
   stages { 
     stage('Init') {
