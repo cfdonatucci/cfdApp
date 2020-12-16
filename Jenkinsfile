@@ -73,7 +73,7 @@ pipeline {
         script{
           node( zosAgent ) {
             
-sh "$DBB_HOME/bin/groovyz -Dlog4j.configurationFile=file:/usr/lpp/IBM/dbb/conf/log4j2.properties /u/adcdmst/zAppBuild/build.groovy $buildType -w ${WORKSPACE} -o ${WORKSPACE}/build-${BUILD_NUMBER} -a testApp -h ${dbbHlq}.STG "
+sh "$DBB_HOME/bin/groovyz -Dlog4j.configurationFile=file:/usr/lpp/IBM/dbb/conf/log4j2.properties /u/adcdmst/zAppBuild/build.groovy $buildType -w ${WORKSPACE} -o ${WORKSPACE}/build-${BUILD_NUMBER} -a cfdApp -h ${dbbHlq}.STG "
 
   
           }
