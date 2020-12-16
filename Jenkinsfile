@@ -18,7 +18,7 @@ def dbbHlq = 'MVS.DBB'
 // ---------------------------- Git (GitHub)
 def gitCred    = 'cfdonatucci'
 def srcGitBranch = '${BRANCH}'
-def srcGitRepo1 = 'git@github.com:cfdonatucci/testApp.git'
+def srcGitRepo1 = 'git@github.com:cfdonatucci/cfdApp.git'
 def srcGitRepo2 = 'git@github.com:cfdonatucci/shrInt.git'
 // ----------------------------- Build type
 //  -i: incremental
@@ -50,15 +50,15 @@ pipeline {
     stage('Git Clone/Refresh') {
         agent { label zosAgent }
         steps {
-            sh(script: 'rm -rf ${WORKSPACE}/testApp', returnStdout: true)
-            sh(script: 'rm -rf ${WORKSPACE}/testApp@tmp', returnStdout: true)
+            sh(script: 'rm -rf ${WORKSPACE}/cfdApp', returnStdout: true)
+            sh(script: 'rm -rf ${WORKSPACE}/cfdApp@tmp', returnStdout: true)
             sh(script: 'rm -rf ${WORKSPACE}/shrInt', returnStdout: true)
             sh(script: 'rm -rf ${WORKSPACE}/shrInt@tmp', returnStdout: true)
             script {
                 println "** >branch: ${srcGitBranch}"
                 println "** >WORKSPACE  ${WORKSPACE}"
 
-                dir('testApp') {
+                dir('cfdApp') {
                 checkout([$class: 'GitSCM', branches: [[name: srcGitBranch]], doGenerateSubmoduleConfigurations: false,
                   submoduleCfg: [], userRemoteConfigs: [[credentialsId: gitCred,url: srcGitRepo1 ]]])}
 
