@@ -1,8 +1,6 @@
 //
-// Pipeline con dos repos
+// Pipeline con dos repos y sparce checkout
 //
-println "** Pipeline script embedded"
-println "** BUILD con BRANCH parametro"
 // ---------------------------Agents labels
 def linuxAgent = 'master'
 def zosAgent   = 'zPDT'
@@ -17,7 +15,8 @@ def dbbUrl = 'https://'+dbbWebApp+':9443/dbb'
 def dbbHlq = 'MVS.DBB'
 // ---------------------------- Git (GitHub)
 def gitCred    = 'cfdonatucci'
-def srcGitBranch = '${BRANCH}'
+//def srcGitBranch = '${BRANCH}'
+//def srcGitBranch = 'main'
 def srcGitRepo1 = 'git@github.com:cfdonatucci/cfdApp.git'
 def srcGitRepo2 = 'git@github.com:cfdonatucci/shrInt.git'
 // ----------------------------- Build type
@@ -29,16 +28,21 @@ def buildType='-f'
 def buildExtraParams='-d'
 // ===========================================================
 pipeline { 
-  agent { label linuxAgent  }
-      environment { WORK_DIR = "${WORKSPACE}/builds/build-${BUILD_NUMBER}" }
-      options { skipDefaultCheckout(true) }
+  agent { label zosAgent }
+      parameters {
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch Name')
+      }
 
+      environment { 
+        WORK_DIR = "${WORKSPACE}/builds/build-${BUILD_NUMBER}"
+        DBB_HOME = '/var/dbb'
+      }
+      options { skipDefaultCheckout(true) }
 // -------------------------------------------------------------------------
   stages { 
     stage('Init') {
      steps {
       script {
-        env.DBB_HOME = '/var/dbb'
         echo "WorkSpace : ${WORKSPACE}/builds/build-${BUILD_NUMBER}"
         echo "Repository: ${srcGitRepo1} - branch: ${srcGitBranch} "
         echo "Repository: ${srcGitRepo2} - branch: ${srcGitBranch} "
@@ -50,21 +54,18 @@ pipeline {
     stage('Git Clone/Refresh') {
         agent { label zosAgent }
         steps {
-            sh(script: 'rm -rf ${WORKSPACE}/cfdApp', returnStdout: true)
-            sh(script: 'rm -rf ${WORKSPACE}/cfdApp@tmp', returnStdout: true)
-            sh(script: 'rm -rf ${WORKSPACE}/shrInt', returnStdout: true)
-            sh(script: 'rm -rf ${WORKSPACE}/shrInt@tmp', returnStdout: true)
             script {
-                println "** >branch: ${srcGitBranch}"
-                println "** >WORKSPACE  ${WORKSPACE}"
+              def srcGitBranch = ${params.BRANCH}
 
-                dir('cfdApp') {
+                dir('testApp') {
                 checkout([$class: 'GitSCM', branches: [[name: srcGitBranch]], doGenerateSubmoduleConfigurations: false,
-                  submoduleCfg: [], userRemoteConfigs: [[credentialsId: gitCred,url: srcGitRepo1 ]]])}
+                  submoduleCfg: [], userRemoteConfigs: [[credentialsId: gitCred,url: srcGitRepo1, ]]])}
 
-                dir('shrInt') {
-                checkout([$class: 'GitSCM', branches: [[name: srcGitBranch]], doGenerateSubmoduleConfigurations: false,
-                   submoduleCfg: [], userRemoteConfigs: [[credentialsId: gitCred,url: srcGitRepo2 ]]])}
+                dir ('shrInt') {
+                sh(script: 'rm -f .git/info/sparse-checkout', returnStdout: true)
+                def scmVars = checkout([$class: 'GitSCM', branches: [[name: srcGitBranch]], doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths:[[$class:'SparseCheckoutPath', path:'copybook/*']]]],
+                    submoduleCfg: [], userRemoteConfigs: [[ credentialsId: gitCred,url: srcGitRepo2, ]]]) }
               
                } } }
 // -----------------------------------ws /u/carlos/jenkins --------------------------------------
@@ -73,12 +74,22 @@ pipeline {
         script{
           node( zosAgent ) {
             
-sh "$DBB_HOME/bin/groovyz -Dlog4j.configurationFile=file:/usr/lpp/IBM/dbb/conf/log4j2.properties /u/adcdmst/zAppBuild/build.groovy $buildType -w ${WORKSPACE} -o ${WORKSPACE}/build-${BUILD_NUMBER} -a cfdApp -h ${dbbHlq}.STG "
-
+sh "$DBB_HOME/bin/groovyz /u/adcdmst/zAppBuild/build.groovy $buildType -w ${WORKSPACE} -o ${WORK_DIR} -a cfdApp -h ${dbbHlq}.STG "
   
-          }
-        }
-      }
-    }
-  }//pipeline
-}//stages
+          }//node
+        }//script
+      }//steps
+
+      post {
+          always {
+              node( zosAgent ) {
+               sh(script: 'rm -rf ${WORKSPACE}/cfdApp*', returnStdout: true)
+               sh(script: 'rm -rf ${WORKSPACE}/shrInt*', returnStdout: true)
+               }
+             }
+          }//post
+
+    }//stage
+
+  }//stages
+}//pipeline
