@@ -1,0 +1,20 @@
+//T4766CDR  JOB (0,1776),'C DONATUCCI',NOTIFY=T4766CD,CLASS=Z           00001001
+//REST EXEC PGM=ADRDSSU,REGION=6M                                       00005001
+//SYSPRINT DD SYSOUT=*                                                  00006001
+//INDD1    DD DISP=SHR,DSN=CORP.CICS.CTS530C3.PRODA.RUNTIME.UI53825     00007002
+//SYSIN    DD    *                                                      00008001
+  RESTORE INDDNAME(INDD1) -                                             00010001
+   DATASET( INCLUDE ( -                                                 00030001
+       CORP.CICS.PRODA.SDFHLINK, -                                      00031003
+       CORP.CICS.PRODA.SDFHLOAD, -                                      00032004
+       HFS.CICSTS.CICS.PRDA -                                           00040003
+                      )) -                                              00070001
+   RENAMEU( -                                                           00080001
+    (CORP.CICS.PRODA.SDFHLINK,CORP.CICS.PRODA.SDFHLINK.N), -            00110005
+    (CORP.CICS.PRODA.SDFHLOAD,CORP.CICS.PRODA.SDFHLOAD.N), -            00111005
+    (HFS.CICSTS.CICS.PRDA,HFS.CICSTS.CICS.PRDA.N) -                     00112005
+          ) -                                                           00120005
+    CATALOG                                                             00130005
+//                                                                      00131004
+         TOL(ENQF) NMC NSC -                                            00132004
+         CANCELERROR                                                    00150001

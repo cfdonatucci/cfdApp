@@ -1,0 +1,16 @@
+//TECCFDRE JOB FPVI606B,TECJVB,MSGCLASS=Q,CLASS=M,                      00001000
+//    MSGLEVEL=(1,1),NOTIFY=TECCFD                                      00002000
+//REST EXEC PGM=ADRDSSU,REGION=6M                                       00010000
+//SYSPRINT DD SYSOUT=*                                                  00020000
+//INDD1    DD DSN=TEC.TECCFD.LBPAS1,                                    00030003
+//            UNIT=SYSDA,VOL=SER=LBPAS1,DISP=SHR                        00030100
+//SYSIN    DD    *                                                      00040000
+ RESTORE DATASET ( -                                                    00050000
+   INCLUDE(     -                                                       00060000
+      **                    -                                           00070001
+           )) -                                                         00080000
+  INDDNAME(INDD1) -                                                     00090000
+    CATALOG                                                             00100007
+//                                                                      00110000
+    REPLACE                                                             00111000
+    CATALOG NMC NSC  RENUNC(T4766CD)                                    00120000

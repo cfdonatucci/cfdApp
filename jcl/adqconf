@@ -1,0 +1,29 @@
+//TECCFDCF JOB FPVI606B,TECCFD,MSGCLASS=Q,CLASS=M,                      00010000
+//    MSGLEVEL=(1,1),NOTIFY=TECCFD                                      00020000
+//STEP01   EXEC PGM=IDCAMS                                              00030000
+//REPORT   DD  SYSOUT=*                                                 00040000
+//SYSPRINT DD  SYSOUT=*                                                 00050000
+//SYSIN DD *                                                            00060000
+ DELETE CICSRL.CILHADQ1.TCP.CONFIG                                      00070001
+ SET MAXCC=0                                                            00080000
+ DEFINE CLUSTER (NAME(CICSRL.CILHADQ1.TCP.CONFIG) -                     00090001
+    CYL(1 1) -                                                          00100000
+    RECORDSIZE(150 150) FREESPACE(0 15) -                               00110000
+    SHAREOPTIONS(3 3) -                                                 00120000
+    LOG(NONE)  -                                                        00130000
+    STORCLAS(SCRLSCIC) -                                                00140000
+    DATACLAS(DCRLSCIC) -                                                00150000
+    INDEXED ) -                                                         00160000
+    DATA ( -                                                            00170000
+      NAME(CICSRL.CILHADQ1.TCP.CONFIG.DATA) -                           00180001
+      KEYS (16 0) ) -                                                   00190000
+    INDEX ( -                                                           00200000
+      NAME(CICSRL.CILHADQ1.TCP.CONFIG.INDEX) )                          00210001
+//*                                                                     00220000
+//REPRO    EXEC PGM=IDCAMS                                              00230000
+//SYSPRINT DD SYSOUT=*                                                  00240000
+//INP DD DISP=SHR,DSN=CICSRL.TESTPL.TCP.CONFIG                          00270002
+//OU  DD DISP=SHR,DSN=CICSRL.CILHADQ1.TCP.CONFIG                        00300001
+//SYSIN    DD *                                                         00310000
+  REPRO INFILE(INP) OUTFILE(OU)                                         00320001
+//                                                                      00370000

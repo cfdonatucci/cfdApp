@@ -1,0 +1,14 @@
+//TECCFDAO JOB FPVI606B,TECCFD,MSGCLASS=Q,CLASS=M,
+//    MSGLEVEL=(1,1),NOTIFY=TECCFD
+//STEP01    EXEC   PGM=ADRDSSU,REGION=0M
+//SYSPRINT  DD     SYSOUT=*
+//SYSIN     DD     *
+ COPY DATASET(INCLUDE( -
+      TEC.TECCFD.RACFADM -
+                      ))               -
+ RENAMEU(                              -
+ (TEC.TECCFD.RACFADM,STR.STRCDO.RACFADM)  -
+               )  -
+   CATALOG   SPHERE  TOL(ENQF)
+//
+    CATALOG  TOL(ENQF) NMC NSC
